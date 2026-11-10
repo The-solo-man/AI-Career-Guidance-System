@@ -642,7 +642,7 @@ function App() {
     const restoreAccount = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/auth/me",
+          "https://ai-career-guidance-backend.onrender.com/api/auth/me",
           {
             headers: {
               Authorization: `Bearer ${authToken}`
@@ -701,8 +701,8 @@ function App() {
     try {
       const endpoint =
         authMode === "register"
-          ? "http://localhost:5000/api/auth/register"
-          : "http://localhost:5000/api/auth/login";
+          ? "https://ai-career-guidance-backend.onrender.com/api/auth/register"
+          : "https://ai-career-guidance-backend.onrender.com/api/auth/login";
 
       const response = await fetch(endpoint, {
         method: "POST",
@@ -788,7 +788,7 @@ function App() {
       setAnalyticsError("");
 
       const response = await fetch(
-        "http://localhost:5000/api/analytics"
+        "https://ai-career-guidance-backend.onrender.com/api/analytics"
       );
 
       const result = await response.json();
@@ -864,7 +864,7 @@ function App() {
     const loadSavedGuidance = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/students/${studentId}/guidance`,
+          `https://ai-career-guidance-backend.onrender.com/api/students/${studentId}/guidance`,
           {
             headers: {
               "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
@@ -979,7 +979,7 @@ function App() {
 
       try {
         const response = await fetch(
-          `http://localhost:5000/api/progress/${studentId}`,
+          `https://ai-career-guidance-backend.onrender.com/api/progress/${studentId}`,
           {
             headers: {
               "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
@@ -1019,7 +1019,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/progress/${studentId}`,
+        `https://ai-career-guidance-backend.onrender.com/api/progress/${studentId}`,
         {
           method: "PUT",
           headers: {
@@ -1097,7 +1097,7 @@ function App() {
       setResumeResult(null);
 
       const response = await fetch(
-        "http://localhost:5000/api/resume/upload",
+        "https://ai-career-guidance-backend.onrender.com/api/resume/upload",
         {
           method: "POST",
           body: formData
@@ -1200,7 +1200,7 @@ function App() {
       setAlignmentResult(null);
 
       const response = await fetch(
-        "http://localhost:5000/api/career-alignment",
+        "https://ai-career-guidance-backend.onrender.com/api/career-alignment",
         {
           method: "POST",
           body: uploadData
@@ -1323,7 +1323,7 @@ function App() {
       setIsSavingProfile(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/student/profile/${studentId}`,
+        `https://ai-career-guidance-backend.onrender.com/api/student/profile/${studentId}`,
         {
           method: "PUT",
           headers: {
@@ -1399,7 +1399,7 @@ function App() {
       setAgentLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/career-agent/chat",
+        "https://ai-career-guidance-backend.onrender.com/api/career-agent/chat",
         {
           method: "POST",
           headers: {
@@ -1459,7 +1459,7 @@ function App() {
       setKnowledgeResults([]);
 
       const response = await fetch(
-        "http://localhost:5000/api/career-knowledge/search",
+        "https://ai-career-guidance-backend.onrender.com/api/career-knowledge/search",
         {
           method: "POST",
           headers: {
@@ -1522,7 +1522,7 @@ function App() {
       setResourceResults(null);
 
       const response = await fetch(
-        "http://localhost:5000/api/learning-resources/search",
+        "https://ai-career-guidance-backend.onrender.com/api/learning-resources/search",
         {
           method: "POST",
           headers: {
@@ -1594,7 +1594,7 @@ function App() {
 
       const response =
         await fetch(
-          "http://localhost:5000/api/students",
+          "https://ai-career-guidance-backend.onrender.com/api/students",
           {
 
             method: "POST",

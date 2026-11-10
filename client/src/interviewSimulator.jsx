@@ -35,7 +35,7 @@ function InterviewSimulator({ career = "Data Scientist" }) {
             );
 
             const response = await fetch(
-                "http://localhost:5000/api/interview/question",
+                "https://ai-career-guidance-backend.onrender.com/api/interview/question",
                 {
                     method: "POST",
                     headers: {
@@ -103,7 +103,7 @@ function InterviewSimulator({ career = "Data Scientist" }) {
             setError("");
 
             const response = await fetch(
-                "http://localhost:5000/api/interview/evaluate",
+                "https://ai-career-guidance-backend.onrender.com/api/interview/evaluate",
                 {
                     method: "POST",
                     headers: {
@@ -171,7 +171,7 @@ function InterviewSimulator({ career = "Data Scientist" }) {
             setError("");
 
             const response = await fetch(
-                "http://localhost:5000/api/interview/report",
+                "https://ai-career-guidance-backend.onrender.com/api/interview/report",
                 {
                     method: "POST",
                     headers: {
