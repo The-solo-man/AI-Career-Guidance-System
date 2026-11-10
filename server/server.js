@@ -1271,14 +1271,9 @@ mongoose
                 });
             }
         });
-
-        app.listen(PORT, () => {
-
-            console.log("\n========================================");
-            console.log("🚀 SERVER STARTED");
-            console.log(`http://localhost:${PORT}`);
-            console.log("========================================");
-
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log("SERVER STARTED");
+            console.log(`Server running on port ${PORT}`);
         });
 
     })
