@@ -231,7 +231,6 @@ app.post("/api/auth/login", async (req, res) => {
             password,
             account.password
         );
-        -l
         if (!isPasswordValid) {
             return res.status(401).json({
                 success: false,
