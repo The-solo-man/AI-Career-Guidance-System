@@ -710,8 +710,7 @@ function App() {
         method: "POST",
 
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(authForm)
       });
