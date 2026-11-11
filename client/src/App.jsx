@@ -699,10 +699,12 @@ function App() {
     setAuthMessage("");
 
     try {
+      const API_BASE_URL =
+        import.meta.env.VITE_API_URL || "https://ai-career-guidance-backend.onrender.com";
+
       const endpoint =
-        authMode === "register"
-          ? "https://ai-career-guidance-backend.onrender.com/api/auth/register"
-          : "https://ai-career-guidance-backend.onrender.com/api/auth/login";
+        `${API_BASE_URL}/api/auth/${authMode === "register" ? "register" : "login"
+        }`;
 
       const response = await fetch(endpoint, {
         method: "POST",
