@@ -87,19 +87,24 @@ app.get("/", (req, res) => {
 // ========================================
 // STUDENT REGISTRATION API
 // ========================================
-
 app.post("/api/auth/register", async (req, res) => {
+    console.log("================================");
+    console.log("REGISTER ROUTE ENTERED");
+    console.log("================================");
+
     try {
         const { name, email, password } = req.body;
 
-        // Validate input
+        // 1. Validate input
         if (!name || !email || !password) {
             return res.status(400).json({
                 success: false,
                 message: "Please provide name, email and password."
             });
         }
-        console.log("REGISTER PASSWORD LENGTH:", password.length);
+
+        console.log("INPUT VALIDATION PASSED");
+
         if (password.length < 4) {
             return res.status(400).json({
                 success: false,
@@ -107,13 +112,17 @@ app.post("/api/auth/register", async (req, res) => {
             });
         }
 
-        // Normalize email
+        // 2. Normalize email
         const normalizedEmail = email.trim().toLowerCase();
 
-        // Check existing account
+        // 3. Check existing account
+        console.log("CHECKING EXISTING ACCOUNT");
+
         const existingAccount = await StudentAccount.findOne({
             email: normalizedEmail
         });
+
+        console.log("EXISTING ACCOUNT CHECK COMPLETED");
 
         if (existingAccount) {
             return res.status(409).json({
@@ -122,23 +131,36 @@ app.post("/api/auth/register", async (req, res) => {
             });
         }
 
-        // Hash password
+        // 4. Hash password
+        console.log("HASHING PASSWORD");
+
         const hashedPassword = await bcrypt.hash(password, 12);
 
-        // Create account
+        console.log("PASSWORD HASHED SUCCESSFULLY");
+
+        // 5. Create account
+        console.log("CREATING ACCOUNT");
+
         const newAccount = await StudentAccount.create({
             name: name.trim(),
             email: normalizedEmail,
             password: hashedPassword
         });
 
-        // Generate JWT token
+        console.log("ACCOUNT CREATED SUCCESSFULLY");
+
+        // 6. Generate JWT token
+        console.log("GENERATING JWT TOKEN");
+
         const token = jwt.sign(
             { sub: newAccount._id.toString() },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
 
+        console.log("JWT TOKEN GENERATED");
+
+        // 7. Send successful response
         return res.status(201).json({
             success: true,
             message: "Registration successful.",
@@ -151,7 +173,7 @@ app.post("/api/auth/register", async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Registration error:", error);
+        console.error("REGISTRATION ERROR:", error);
 
         if (error.code === 11000) {
             return res.status(409).json({
@@ -201,7 +223,7 @@ app.post("/api/auth/login", async (req, res) => {
             password,
             account.password
         );
--l
+        -l
         if (!isPasswordValid) {
             return res.status(401).json({
                 success: false,
