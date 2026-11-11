@@ -48,8 +48,14 @@ const upload = multer({
 // ========================================
 // MIDDLEWARE
 // ========================================
+const corsOptions = {
+    origin: "https://ai-career-guidance-frontend-ubjz.onrender.com",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+};
 
-app.use(cors());
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 
 
