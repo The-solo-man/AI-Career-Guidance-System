@@ -84,6 +84,14 @@ app.get("/", (req, res) => {
     });
 
 });
+app.post("/api/test-post", (req, res) => {
+    console.log("TEST POST ROUTE REACHED");
+
+    res.status(200).json({
+        success: true,
+        message: "POST request is working!"
+    });
+});
 // ========================================
 // STUDENT REGISTRATION API
 // ========================================
