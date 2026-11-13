@@ -78,7 +78,8 @@ app.use((req, res, next) => {
 // ========================================
 const allowedOrigins = [
     "http://localhost:5173",
-    "https://ai-career-guidance-frontend-ubjz.onrender.com"
+    "https://ai-career-guidance-frontend-ubjz.onrender.com",
+    "https://ai-career-guidance-system-two.vercel.app"
 ];
 
 const corsOptions = {
