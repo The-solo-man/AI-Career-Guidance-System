@@ -1,5 +1,8 @@
+
 import { useState } from "react";
 import "./InterviewSimulator.css";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 function InterviewSimulator({ career = "Data Scientist" }) {
     const [difficulty, setDifficulty] = useState("Medium");
@@ -35,7 +38,7 @@ function InterviewSimulator({ career = "Data Scientist" }) {
             );
 
             const response = await fetch(
-                "https://ai-career-guidance-backend.onrender.com/api/interview/question",
+                `${API_BASE_URL}/api/interview/question`,
                 {
                     method: "POST",
                     headers: {
@@ -103,7 +106,7 @@ function InterviewSimulator({ career = "Data Scientist" }) {
             setError("");
 
             const response = await fetch(
-                "https://ai-career-guidance-backend.onrender.com/api/interview/evaluate",
+                `${API_BASE_URL}/api/interview/evaluate`,
                 {
                     method: "POST",
                     headers: {
@@ -171,7 +174,7 @@ function InterviewSimulator({ career = "Data Scientist" }) {
             setError("");
 
             const response = await fetch(
-                "https://ai-career-guidance-backend.onrender.com/api/interview/report",
+                `${API_BASE_URL}/api/interview/report`,
                 {
                     method: "POST",
                     headers: {
