@@ -25,6 +25,20 @@ const Student = require("./models/student");
 const StudentAccount = require("./models/StudentAccount");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const emailTransporter = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000
+});
 const StudentProgress = require("./models/StudentProgress");
 
 const {
@@ -62,8 +76,19 @@ app.use((req, res, next) => {
 // ========================================
 // MIDDLEWARE
 // ========================================
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://ai-career-guidance-frontend-ubjz.onrender.com"
+];
+
 const corsOptions = {
-    origin: "https://ai-career-guidance-frontend-ubjz.onrender.com",
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
 };
@@ -122,6 +147,14 @@ app.post("/api/auth/register", async (req, res) => {
 
         // 2. Normalize email
         const normalizedEmail = email.trim().toLowerCase();
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailPattern.test(normalizedEmail)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter a valid email address."
+            });
+        }
 
         // 3. Check existing account
         console.log("CHECKING EXISTING ACCOUNT");
@@ -167,6 +200,42 @@ app.post("/api/auth/register", async (req, res) => {
         );
 
         console.log("JWT TOKEN GENERATED");
+        // Send welcome email
+        try {
+            console.log("STARTING WELCOME EMAIL...");
+            await emailTransporter.sendMail({
+                from: `"AI Career Guidance System" <${process.env.EMAIL_USER}>`,
+                to: newAccount.email,
+                subject: "Welcome to AI Career Guidance System!",
+                text: `Hello ${newAccount.name},
+
+Thank you for registering with the AI Career Guidance System!
+
+We are excited to help you discover suitable career paths, identify your skills, and build your future with personalized AI-powered career guidance.
+
+Log in to your account and start exploring your career opportunities.
+
+Best regards,
+AI Career Guidance System by APEX_PREDATORS Team`,
+                html: `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2>Welcome to AI Career Guidance System!</h2>
+                <p>Hello ${newAccount.name},</p>
+                <p>Thank you for registering with our AI Career Guidance System!</p>
+                <p>We are excited to help you discover suitable career paths,
+                identify your skills, and build your future.</p>
+                <p>Log in and start exploring your career opportunities.</p>
+                <p>Best regards,<br>
+                <strong>AI Career Guidance System Team</strong></p>
+            </div>
+        `
+            });
+
+            console.log("WELCOME EMAIL SENT:", newAccount.email);
+
+        } catch (emailError) {
+            console.error("WELCOME EMAIL FAILED:", emailError.message);
+        }
 
         // 7. Send successful response
         return res.status(201).json({
@@ -1253,67 +1322,80 @@ app.put(
         }
     }
 );
+
 // ========================================
-// MONGODB CONNECTION
+// RAG CAREER KNOWLEDGE SEARCH API
+// ========================================
+app.post("/api/career-knowledge/search", async (req, res) => {
+    try {
+        const { question } = req.body;
+
+        if (!question || typeof question !== "string" || !question.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide a question."
+            });
+        }
+
+        const results = await searchCareerKnowledge(question);
+
+        return res.status(200).json({
+            success: true,
+            totalResults: results.length,
+            results
+        });
+
+    } catch (error) {
+        console.error("Career Knowledge API Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to search career knowledge."
+        });
+    }
+});
+
+// ========================================
+// MONGODB CONNECTION AND SERVER STARTUP
 // ========================================
 
-mongoose
-    .connect(process.env.MONGO_URI)
+const PORT = process.env.PORT || 5000;
 
-    .then(async () => {
+async function startServer() {
+    try {
+        if (!process.env.MONGO_URI) {
+            throw new Error("MONGO_URI is missing from environment variables.");
+        }
+
+        await mongoose.connect(process.env.MONGO_URI);
 
         console.log("\n========================================");
         console.log("✅ MONGODB CONNECTED SUCCESSFULLY");
         console.log("========================================");
-        console.log("Generating career embeddings...");
-        await generateCareerEmbeddings();
 
-
-        // ========================================
-        // START SERVER
-        // ========================================
-
-        const PORT = process.env.PORT || 5000;
-        // RAG Career Knowledge Search API
-        app.post("/api/career-knowledge/search", async (req, res) => {
-            try {
-                const { question } = req.body;
-
-                if (!question || !question.trim()) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Please provide a question."
-                    });
-                }
-
-                const results = await searchCareerKnowledge(question);
-
-                res.status(200).json({
-                    success: true,
-                    totalResults: results.length,
-                    results
-                });
-
-            } catch (error) {
-                console.error("Career Knowledge API Error:", error);
-
-                res.status(500).json({
-                    success: false,
-                    message: "Unable to search career knowledge."
-                });
-            }
-        });
-        app.listen(PORT, '0.0.0.0', () => {
+        // Start accepting requests as soon as MongoDB is connected.
+        // Embedding generation must not delay the HTTP server startup.
+        app.listen(PORT, "0.0.0.0", () => {
             console.log("SERVER STARTED");
             console.log(`Server running on port ${PORT}`);
         });
 
-    })
+        // Generate/update embeddings in the background.
+        // A failure here should not prevent the API server from running.
+        console.log("Starting career embedding generation in the background...");
+        generateCareerEmbeddings()
+            .then(() => {
+                console.log("Career embeddings generated successfully.");
+            })
+            .catch((error) => {
+                console.error("Career embedding generation failed:", error);
+            });
 
-    .catch((error) => {
-
-        console.error("\n❌ MONGODB CONNECTION FAILED");
-
+    } catch (error) {
+        console.error("\n❌ BACKEND STARTUP FAILED");
         console.error(error);
+        process.exit(1);
+    }
+}
 
-    });
+startServer();
