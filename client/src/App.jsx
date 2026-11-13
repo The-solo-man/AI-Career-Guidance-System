@@ -698,8 +698,25 @@ function App() {
   const handleAuthSubmit = async (event) => {
     event.preventDefault();
 
-    setAuthLoading(true);
     setAuthMessage("");
+
+    const email = String(authForm.email || "").trim();
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/;
+
+    if (!emailPattern.test(email)) {
+      setAuthMessage(
+        "❌ Invalid email address. Please enter a valid email such as example@gmail.com."
+      );
+      return;
+    }
+
+    if (authMode === "register" && !authForm.name.trim()) {
+      setAuthMessage("❌ Please enter your name.");
+      return;
+    }
+
+    setAuthLoading(true);
 
     try {
       const API_BASE_URL =
@@ -724,16 +741,30 @@ function App() {
         throw new Error(data.message || "Authentication failed.");
       }
 
-      // Save login token
+      // Registration completed
+      if (authMode === "register") {
+        setAuthForm({
+          name: "",
+          email: "",
+          password: ""
+        });
+
+        setAuthMode("login");
+
+        setAuthMessage(
+          "Registration completed successfully! Please log in to continue."
+        );
+
+        return;
+      }
+
+      // Login completed
       sessionStorage.setItem("authToken", data.token);
       setAuthToken(data.token);
 
-      // Save account information
       setAccount(data.account);
 
-      // Restore linked career profile
       const savedStudentId = data.account.studentId;
-
       setStudentId(savedStudentId || null);
 
       setAuthForm({
@@ -742,13 +773,8 @@ function App() {
         password: ""
       });
 
-      setAuthMessage(
-        authMode === "register"
-          ? "Registration successful!"
-          : "Login successful!"
-      );
+      setAuthMessage("Login successful!");
 
-      // Open the appropriate page
       setActiveSection(
         savedStudentId ? "dashboard" : "career"
       );
@@ -1581,10 +1607,18 @@ function App() {
 
     event.preventDefault();
 
+    setAuthMessage("");
 
-    setLoading(true);
+    const email = authForm.email.trim();
 
-    setMessage("");
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+      setAuthMessage("Please enter a valid email address, such as example@gmail.com.");
+      return;
+    }
+
+    setAuthLoading(true);
 
     setGuidance(null);
 

@@ -222,6 +222,15 @@ select {
     font-weight: 700;
     opacity: 1;
     visibility: visible;
+.profile-header h2 {
+  display:block;
+  color:#17324d !important;
+  font-size:28px;
+  font-weight:700;
+  opacity:1;
+  visibility:visible;
+
+}
 }
 .profile-grid {
   display: grid;
