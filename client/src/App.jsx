@@ -1604,61 +1604,29 @@ function App() {
   ======================================================= */
 
   const handleSubmit = async (event) => {
-
     event.preventDefault();
 
-    setAuthMessage("");
-
-    const email = authForm.email.trim();
-
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailPattern.test(email)) {
-      setAuthMessage("Please enter a valid email address, such as example@gmail.com.");
-      return;
-    }
-
-    setAuthLoading(true);
-
+    setLoading(true);
     setGuidance(null);
 
-
     try {
+      console.log("Sending student data...");
 
-      console.log(
-        "Sending student data..."
+      const response = await fetch(
+        `${API_BASE_URL}/api/students`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
+          },
+          body: JSON.stringify(formData)
+        }
       );
 
+      const data = await response.json();
 
-      const response =
-        await fetch(
-          `${API_BASE_URL}/api/students`,
-          {
-
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-              "Authorization": `Bearer ${sessionStorage.getItem("authToken")}`
-            },
-
-            body:
-              JSON.stringify(
-                formData
-              )
-          }
-        );
-
-
-      const data =
-        await response.json();
-
-
-      console.log(
-        "Backend response:",
-        data
-      );
+      console.log("Backend response:", data);
 
       if (!response.ok) {
         const validationMessage =
@@ -1666,59 +1634,30 @@ function App() {
             ? `${data.message || "Profile validation failed."}\n\n${data.issues
               .map((issue, index) => `${index + 1}. ${issue}`)
               .join("\n")}`
-            : data.error ||
-            data.message ||
-            "Server error";
+            : data.error || data.message || "Server error";
 
         throw new Error(validationMessage);
       }
 
-      const normalized =
-        normalizeGuidance(
-          data.aiGuidance
-        );
+      const normalized = normalizeGuidance(data.aiGuidance);
 
-
-      console.log(
-        "Normalized guidance:",
-        normalized
-      );
-
+      console.log("Normalized guidance:", normalized);
 
       if (!normalized) {
-
-        throw new Error(
-          "AI guidance was not returned."
-        );
+        throw new Error("AI guidance was not returned.");
       }
 
-      setGuidance(
-        normalized
-      );
+      setGuidance(normalized);
       setStudentId(data.student._id);
       localStorage.setItem("studentId", data.student._id);
       setActiveSection("dashboard");
-      setMessage(
-        "Student data saved successfully!"
-      );
-
+      setMessage("Student data saved successfully!");
 
     } catch (error) {
-
-      console.error(
-        "Frontend error:",
-        error
-      );
-
-
-      setMessage(
-        "❌ " +
-        error.message
-      );
-
+      console.error("Frontend error:", error);
+      setMessage("❌ " + error.message);
 
     } finally {
-
       setLoading(false);
     }
   };
