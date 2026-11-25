@@ -2134,6 +2134,14 @@ function App() {
         40,
         216
       );
+
+      doc.rect(
+        0,
+        0,
+        pageWidth,
+        45,
+        "F"
+      );
       // Add logo only once at the top of the PDF
       if (logo.complete && logo.naturalWidth > 0) {
         doc.addImage(
@@ -2145,14 +2153,6 @@ function App() {
           18
         );
       }
-
-      doc.rect(
-        0,
-        0,
-        pageWidth,
-        45,
-        "F"
-      );
 
 
 
