@@ -1724,7 +1724,7 @@ function App() {
   /* =======================================================
      SUBMIT
   ======================================================= */
-  
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -1953,16 +1953,6 @@ function App() {
             "helvetica",
             "bold"
           );
-          if (logo.complete && logo.naturalWidth > 0) {
-            doc.addImage(
-              logo,
-              "JPEG",
-              margin,
-              y - 12,
-              18,
-              18
-            );
-          }
 
 
           doc.text(
@@ -2144,7 +2134,17 @@ function App() {
         40,
         216
       );
-
+      // Add logo only once at the top of the PDF
+      if (logo.complete && logo.naturalWidth > 0) {
+        doc.addImage(
+          logo,
+          "JPEG",
+          margin,
+          10,
+          18,
+          18
+        );
+      }
 
       doc.rect(
         0,
@@ -2153,6 +2153,7 @@ function App() {
         45,
         "F"
       );
+
 
 
       doc.setTextColor(
